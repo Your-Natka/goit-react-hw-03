@@ -1,24 +1,18 @@
-import { useState } from "react";
+import { useId } from "react";
 import css from "./SearchBox.module.css";
 
-export const SearchBox = () => {
-  const [inputValue, setInputValue] = useState("");
-  const handleChange = (evt) => {
-    setInputValue(evt.target.value);
-  };
+export const SearchBox = ({ value, onChange }) => {
+    const id = useId();
 
-  console.log(inputValue);
-
-  return (
-    <div>
-      <label className={css.label}>Find contacts by name </label>
-      <input
-        placeholder="Search by name"
-        type="text"
-        value={inputValue}
-        onChange={handleChange}
-      />
-      <p>{inputValue}</p>
-    </div>
-  );
+    return (
+        <div className={css.filter}>
+            <label htmlFor={id}>Find contact by name</label>
+            <input type="text"
+                id={id}
+                value={value}
+                onChange={evt => onChange(evt.target.value)}
+                className={css.input}
+            />
+        </div>
+    );
 };

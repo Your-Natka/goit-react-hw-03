@@ -1,57 +1,49 @@
 import { useId } from "react";
-import css from "./ContactForm/ContactForm.module.css";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { nanoid } from "nanoid";
+import css from "./ContactForm.module.css";
 
-export const ContactForm = ({ onSubmit }) => {
-  const usernameFildeId = useId();
-  const userphoneFildeId = useId();
+const validation = Yup.object().shape({
+    name: Yup.string()
+        .min(3, "Not enough symbols!")
+        .max(50, "Too long!")
+        .required("Required field!"),
+    number: Yup.string()
+        .min(9, "Not enough symbols!")
+        .max(9, "Too long!")
+        .required("Required field!"),
+});
 
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
+export const ContactForm = ({ onAdd }) => {
+    const nameField = useId();
+    const numberField = useId();
 
-    const form = evt.target;
-    const { name, phone } = form.elements;
-
-    onSubmit({
-      name: name.value,
-      phone: phone.value,
-    });
-
-    // Посилання на DOM-елементи
-    // console.log(phone або  name);
-
-    // Значення полів
-    // console.log(form.elements.name.value);
-    // console.log(form.elements.phone.value);
-
-    // Скидаємо значення полів після відправки
-    form.reset();
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <label
-        className={css.label}
-        htmlFor={usernameFildeId}
-      >
-        Name
-      </label>
-      <input
-        type="text"
-        name="name"
-        id={usernameFildeId}
-      />
-      <label
-        className={css.label}
-        htmlFor={userphoneFildeId}
-      >
-        Number
-      </label>
-      <input
-        type="tel"
-        name="phone"
-        id={userphoneFildeId}
-      />
-      <button type="submit">Add contact</button>
-    </form>
-  );
-};
+    return (
+        <Formik
+            initialValues={{
+                name: "",
+                number: ""
+            }}
+            onSubmit={(values, actions) => {
+                onAdd({ id: nanoid(5), ...values });
+                actions.resetForm();
+            }}
+            validationSchema={validation}
+        >
+            <Form className={css.form}>
+                <div className={css.item}>
+                    <label className={css.label} htmlFor={nameField}>Name</label>
+                    <Field className={css.input} type="text" name="name" id={nameField} />
+                    <ErrorMessage className={css.error} name="name" component="span"/>
+                </div>
+                <div className={css.item}>
+                    <label className={css.label} htmlFor={numberField}>Number</label>
+                    <Field className={css.input} type="text" name="number" id={numberField}/>
+                    <ErrorMessage className={css.error} name="number" component="span"/>
+                </div>
+                <button className={css.button} type="submit">Add contact</button>
+            </Form>
+        </Formik>
+    )
+}
